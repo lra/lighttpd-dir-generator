@@ -114,7 +114,7 @@ function format_bytes($size, $precision=0) {
 // This function returns the mime type of $file.
 //
 function get_file_type($file) {
-	global $image_types, $movie_types;
+	global $image_types, $movie_types, $archive_types, $document_types, $font_types;
 
 	$pos = strrpos($file, ".");
 	if ($pos === false) {
