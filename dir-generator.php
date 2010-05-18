@@ -1,6 +1,6 @@
 <?php
 
-$VERSION = "0.2";
+$VERSION = "0.3";
 
 /*  Lighttpd Enhanced Directory Listing Script
  *  ------------------------------------------
@@ -27,12 +27,27 @@ $VERSION = "0.2";
  *  http://www.gnu.org/licenses/gpl.txt
  */
  
+/*  Revision by KittyKatt
+ *  ---------------------
+ *  E-Mail:  kittykatt@archlinux.us
+ *  Website: http://www.archerseven.com/kittykatt/
+ *  Version:  2010.03.01
+ *
+ *  Revised original code to include hiding for directories prefixed with a "." (or hidden
+ *  directories) as the script was only hiding files prefixed with a "." before. Also included more 
+ *  file extensions/definitions.
+ *
+ */
+ 
 $show_hidden_files = true;
 $calculate_folder_size = false;
 
 // Various file type associations
-$movie_types = array('mpg','mpeg','avi','asf','mp3','wav','mp4','wma','aif','aiff', 'ram', 'midi','mid', 'asf', 'au');
-$image_types = array('jpg','jpeg','gif','png','tif','tiff','bmp');
+$movie_types = array('mpg','mpeg','avi','asf','mp3','wav','mp4','wma','aif','aiff','ram', 'midi','mid','asf','au','flac');
+$image_types = array('jpg','jpeg','gif','png','tif','tiff','bmp','ico');
+$archive_types = array('zip','cab','7z','gz','tar.bz2','tar.gz','tar','rar',);
+$document_types = array('txt','text','doc','docx','abw','odt','pdf','rtf','tex','texinfo',);
+$font_types = array('ttf','otf','abf','afm','bdf','bmf','fnt','fon','mgf','pcf','ttc','tfm','snf','sfd');
 
 
 // Get the path (cut out the query string from the request_uri)
@@ -108,10 +123,19 @@ function get_file_type($file) {
 	
 	$ext = rtrim(substr($file, $pos+1), "~");
 	if(in_array($ext, $image_types)) {
-		$type = "Image";
+		$type = "Image File";
 	
 	} elseif(in_array($ext, $movie_types)) {
-		$type = "Video";
+		$type = "Video File";
+	
+	} elseif(in_array($ext, $archive_types)) {
+		$type = "Compressed Archive";
+	
+	} elseif(in_array($ext, $document_types)) {
+		$type = "Type Document";
+	
+	} elseif(in_array($ext, $font_types)) {
+		$type = "Type Font";
 	
 	} else {
 		$type = "File";
@@ -159,6 +183,11 @@ $filelist = array();
 if($handle = @opendir($path)) {
 	while(($item = readdir($handle)) !== false) {
 		if(is_dir($path.'/'.$item) and $item != '.' and $item != '..') {
+			if( $show_hidden_files == "false" ) {
+				if(substr($item, 0, 1) == "." or substr($item, -1) == "~") {
+				  continue;
+				}
+			}
 			$folderlist[] = array(
 				'name' => $item, 
 				'size' => (($calculate_folder_size)?foldersize($path.'/'.$item):0), 
@@ -168,9 +197,9 @@ if($handle = @opendir($path)) {
 		}
 		
 		elseif(is_file($path.'/'.$item)) {
-			if(!$show_hidden_files) {
+			if( $show_hidden_files == "false" ) {
 				if(substr($item, 0, 1) == "." or substr($item, -1) == "~") {
-					continue;
+				  continue;
 				}
 			}
 			$filelist[] = array(
@@ -235,8 +264,8 @@ print "</tr></thead><tbody>";
 // Parent directory link
 if($path != "./") {
 	print "<tr><td class='n'><a href='..'>Parent Directory</a>/</td>";
-	print "<td class='m'>&nbsp;</td>";
-	print "<td class='s'>&nbsp;</td>";
+	print "<td class='m'> </td>";
+	print "<td class='s'> </td>";
 	print "<td class='t'>Directory</td></tr>";
 }
 
@@ -246,7 +275,7 @@ if($path != "./") {
 foreach($folderlist as $folder) {
 	print "<tr><td class='n'><a href='" . addslashes($folder['name']). "'>" .htmlentities($folder['name']). "</a>/</td>";
 	print "<td class='m'>" . date('Y-M-d H:m:s', $folder['modtime']) . "</td>";
-	print "<td class='s'>" . (($calculate_folder_size)?format_bytes($folder['size'], 2):'--') . "&nbsp;</td>";
+	print "<td class='s'>" . (($calculate_folder_size)?format_bytes($folder['size'], 2):'--') . " </td>";
 	print "<td class='t'>" . $folder['file_type']                    . "</td></tr>";
 }
 
@@ -261,7 +290,7 @@ print "<tr><td colspan='4' style='height:7px;'></td></tr>";
 foreach($filelist as $file) {
 	print "<tr><td class='n'><a href='" . addslashes($file['name']). "'>" .htmlentities($file['name']). "</a></td>";
 	print "<td class='m'>" . date('Y-M-d H:m:s', $file['modtime'])   . "</td>";
-	print "<td class='s'>" . format_bytes($file['size'],2)           . "&nbsp;</td>";
+	print "<td class='s'>" . format_bytes($file['size'],2)           . " </td>";
 	print "<td class='t'>" . $file['file_type']                      . "</td></tr>";
 }
 
@@ -284,4 +313,4 @@ print "</tbody>
 	Regards, 
 	   Evan Fosmark < me@evanfosmark.com >
 \* -------------------------------------------------------------------------------- */
-?>
+?>	
