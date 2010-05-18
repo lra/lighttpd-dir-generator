@@ -175,8 +175,6 @@ print "<?xml version='1.0' encoding='utf-8'?>
 	<table summary='Directory Listing' cellpadding='0' cellspacing='0'>";
 
 
-
-
 // Get all of the folders and files.
 $folderlist = array();
 $filelist = array();
@@ -197,6 +195,10 @@ if($handle = @opendir($path)) {
 		}
 
 		elseif(is_file($path.'/'.$item)) {
+			if ($item === basename($_SERVER['SCRIPT_NAME']))
+			{
+				continue;
+			}
 			if( $show_hidden_files == "false" ) {
 				if(substr($item, 0, 1) == "." or substr($item, -1) == "~") {
 				  continue;
