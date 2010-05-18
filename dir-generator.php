@@ -1,6 +1,6 @@
 <?php
 
-$VERSION = "0.3";
+$VERSION = '0.4';
 
 /*  Lighttpd Enhanced Directory Listing Script
  *  ------------------------------------------
@@ -26,7 +26,7 @@ $VERSION = "0.3";
  *
  *  http://www.gnu.org/licenses/gpl.txt
  */
- 
+
 /*  Revision by KittyKatt
  *  ---------------------
  *  E-Mail:  kittykatt@archlinux.us
@@ -34,11 +34,11 @@ $VERSION = "0.3";
  *  Version:  2010.03.01
  *
  *  Revised original code to include hiding for directories prefixed with a "." (or hidden
- *  directories) as the script was only hiding files prefixed with a "." before. Also included more 
+ *  directories) as the script was only hiding files prefixed with a "." before. Also included more
  *  file extensions/definitions.
  *
  */
- 
+
 $show_hidden_files = true;
 $calculate_folder_size = false;
 
@@ -85,7 +85,7 @@ function foldersize($path) {
 			if(is_file($path."/".$file)){
 				$size += filesize($path."/".$file);
 			}
-			
+
 			if(is_dir($path."/".$file)){
 				if($file != "." && $file != "..") {
 					$size += foldersize($path."/".$file);
@@ -93,7 +93,7 @@ function foldersize($path) {
 			}
 		}
 	}
-	
+
 	return $size;
 }
 
@@ -115,32 +115,32 @@ function format_bytes($size, $precision=0) {
 //
 function get_file_type($file) {
 	global $image_types, $movie_types;
-	
+
 	$pos = strrpos($file, ".");
 	if ($pos === false) {
 		return "Unknown File";
 	}
-	
+
 	$ext = rtrim(substr($file, $pos+1), "~");
 	if(in_array($ext, $image_types)) {
 		$type = "Image File";
-	
+
 	} elseif(in_array($ext, $movie_types)) {
 		$type = "Video File";
-	
+
 	} elseif(in_array($ext, $archive_types)) {
 		$type = "Compressed Archive";
-	
+
 	} elseif(in_array($ext, $document_types)) {
 		$type = "Type Document";
-	
+
 	} elseif(in_array($ext, $font_types)) {
 		$type = "Type Font";
-	
+
 	} else {
 		$type = "File";
 	}
-	
+
 	return(strtoupper($ext) . " " . $type);
 }
 
@@ -177,7 +177,7 @@ print "<?xml version='1.0' encoding='utf-8'?>
 
 
 
-// Get all of the folders and files. 
+// Get all of the folders and files.
 $folderlist = array();
 $filelist = array();
 if($handle = @opendir($path)) {
@@ -189,13 +189,13 @@ if($handle = @opendir($path)) {
 				}
 			}
 			$folderlist[] = array(
-				'name' => $item, 
-				'size' => (($calculate_folder_size)?foldersize($path.'/'.$item):0), 
+				'name' => $item,
+				'size' => (($calculate_folder_size)?foldersize($path.'/'.$item):0),
 				'modtime'=> filemtime($path.'/'.$item),
 				'file_type' => "Directory"
 			);
 		}
-		
+
 		elseif(is_file($path.'/'.$item)) {
 			if( $show_hidden_files == "false" ) {
 				if(substr($item, 0, 1) == "." or substr($item, -1) == "~") {
@@ -203,8 +203,8 @@ if($handle = @opendir($path)) {
 				}
 			}
 			$filelist[] = array(
-				'name'=> $item, 
-				'size'=> filesize($path.'/'.$item), 
+				'name'=> $item,
+				'size'=> filesize($path.'/'.$item),
 				'modtime'=> filemtime($path.'/'.$item),
 				'file_type' => get_file_type($path.'/'.$item)
 			);
@@ -310,7 +310,6 @@ print "</tbody>
 	I hope you enjoyed my take on the enhanced directory listing script!
 	If you have any questions, feel free to contact me.
 
-	Regards, 
+	Regards,
 	   Evan Fosmark < me@evanfosmark.com >
 \* -------------------------------------------------------------------------------- */
-?>	
