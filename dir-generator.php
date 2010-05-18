@@ -41,6 +41,10 @@ $VERSION = '0.4';
 
 $show_hidden_files = true;
 $calculate_folder_size = false;
+$display_header = true;
+$display_readme = true;
+$hide_header = true;
+$hide_readme = true;
 
 // Various file type associations
 $movie_types = array('mpg','mpeg','avi','asf','mp3','wav','mp4','wma','aif','aiff','ram', 'midi','mid','asf','au','flac');
@@ -169,8 +173,24 @@ print "<?xml version='1.0' encoding='utf-8'?>
 		div.script_title {float:right;text-align:right;font-size:8pt;color:#999;}
 		</style>
 	</head>
-	<body>
-	<h2>Index of /" . $vpath ."</h2>
+	<body>";
+
+if ($display_header)
+{
+	if (is_file($path.'/HEADER'))
+	{
+		print "<pre>";
+		print(nl2br(file_get_contents($path.'/HEADER')));
+		print "</pre>";
+	}
+
+	if (is_file($path.'/HEADER.html'))
+	{
+		readfile($path.'/HEADER.html');
+	}
+}
+
+print "<h2>Index of /" . $vpath ."</h2>
 	<div class='list'>
 	<table summary='Directory Listing' cellpadding='0' cellspacing='0'>";
 
@@ -198,6 +218,20 @@ if($handle = @opendir($path)) {
 			if ($item === basename($_SERVER['SCRIPT_NAME']))
 			{
 				continue;
+			}
+			if ($hide_header)
+			{
+				if ($item === 'HEADER' || $item === 'HEADER.html')
+				{
+					continue;
+				}
+			}
+			if ($hide_readme)
+			{
+				if ($item === 'README' || $item === 'README.html')
+				{
+					continue;
+				}
 			}
 			if( $show_hidden_files == "false" ) {
 				if(substr($item, 0, 1) == "." or substr($item, -1) == "~") {
@@ -301,8 +335,24 @@ foreach($filelist as $file) {
 // Print ending stuff
 print "</tbody>
 	</table>
-	</div>
-	<div class='script_title'>Lighttpd Enhanced Directory Listing Script</div>
+	</div>";
+
+if ($display_readme)
+{
+	if (is_file($path.'/README'))
+	{
+		print "<pre>";
+		print(nl2br(file_get_contents($path.'/README')));
+		print "</pre>";
+	}
+
+	if (is_file($path.'/README.html'))
+	{
+		readfile($path.'/README.html');
+	}
+}
+
+print "	<div class='script_title'>Lighttpd Enhanced Directory Listing Script</div>
 	<div class='foot'>". $_ENV['SERVER_SOFTWARE'] . "</div>
 	</body>
 	</html>";
