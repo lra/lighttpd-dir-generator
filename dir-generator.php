@@ -274,7 +274,7 @@ if($_GET['order']) {
 } else {
 	array_multisort($folder_order_by, SORT_ASC, $folderlist);
 	array_multisort($file_order_by, SORT_ASC, $filelist);
-	$order = "&order=desc";
+	$order = "&amp;order=desc";
 }
 
 
