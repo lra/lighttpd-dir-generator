@@ -163,7 +163,7 @@ print '<!DOCTYPE html>
 		a:hover, a:focus {text-decoration: underline; color: red;}
 		body {background-color: #F5F5F5;}
 		h2 {margin-bottom: 12px;}
-		table {margin-left: 12px;}
+		table {margin-left: 12px; padding:0px; border-collapse:collapse;}
 		th, td { font-family: "Courier New", Courier, monospace; font-size: 10pt; text-align: left;}
 		th { font-weight: bold; padding-right: 14px; padding-bottom: 3px;}
 		td {padding-right: 14px;}
@@ -193,7 +193,7 @@ if ($display_header)
 
 print "<h2>Index of /" . $vpath ."</h2>
 	<div class='list'>
-	<table summary='Directory Listing' cellpadding='0' cellspacing='0'>";
+	<table>";
 
 
 // Get all of the folders and files.
