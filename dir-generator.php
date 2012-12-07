@@ -311,7 +311,7 @@ if($path != "./") {
 // Print folder information
 foreach($folderlist as $folder) {
 	print "<tr><td class='n'><a href='" . addslashes($folder['name']). "'>" .htmlentities($folder['name']). "</a>/</td>";
-	print "<td class='m'>" . date('Y-M-d H:m:s', $folder['modtime']) . "</td>";
+	print "<td class='m'>" . date('Y-M-d H:i:s', $folder['modtime']) . "</td>";
 	print "<td class='s'>" . (($calculate_folder_size)?format_bytes($folder['size'], 2):'--') . " </td>";
 	print "<td class='t'>" . $folder['file_type']                    . "</td></tr>";
 }
@@ -326,7 +326,7 @@ print "<tr><td colspan='4' style='height:7px;'></td></tr>";
 // Print file information
 foreach($filelist as $file) {
 	print "<tr><td class='n'><a href='" . addslashes($file['name']). "'>" .htmlentities($file['name']). "</a></td>";
-	print "<td class='m'>" . date('Y-M-d H:m:s', $file['modtime'])   . "</td>";
+	print "<td class='m'>" . date('Y-M-d H:i:s', $file['modtime'])   . "</td>";
 	print "<td class='s'>" . format_bytes($file['size'],2)           . " </td>";
 	print "<td class='t'>" . $file['file_type']                      . "</td></tr>";
 }
