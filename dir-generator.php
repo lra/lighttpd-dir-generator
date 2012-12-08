@@ -39,7 +39,7 @@ $VERSION = '0.4';
  *
  */
 
-$show_hidden_files = true;
+$show_hidden_files = false;
 $calculate_folder_size = false;
 $display_header = true;
 $display_readme = true;
@@ -63,19 +63,18 @@ $path = ltrim(rawurldecode($path), '/');
 
 
 if(strlen($path) == 0) {
-	$path = "./";
+    $path = "./";
 }
-
 
 // Can't call the script directly since REQUEST_URI won't be a directory
 if($_SERVER['PHP_SELF'] == '/'.$path) {
-	die("Unable to call " . $path . " directly.");
+    die("Unable to call " . $path . " directly.");
 }
 
 
 // Make sure it is valid.
 if(!is_dir($path)) {
-	die("<b>" . $path . "</b> is not a valid path.");
+    die("<b>" . $path . "</b> is not a valid path.");
 }
 
 
@@ -83,22 +82,22 @@ if(!is_dir($path)) {
 // Get the size in bytes of a folder
 //
 function foldersize($path) {
-	$size = 0;
-	if($handle = @opendir($path)){
-		while(($file = readdir($handle)) !== false) {
-			if(is_file($path."/".$file)){
-				$size += filesize($path."/".$file);
-			}
+    $size = 0;
+    if($handle = @opendir($path)){
+        while(($file = readdir($handle)) !== false) {
+            if(is_file($path."/".$file)){
+                $size += filesize($path."/".$file);
+            }
 
-			if(is_dir($path."/".$file)){
-				if($file != "." && $file != "..") {
-					$size += foldersize($path."/".$file);
-				}
-			}
-		}
-	}
+            if(is_dir($path."/".$file)){
+                if($file != "." && $file != "..") {
+                    $size += foldersize($path."/".$file);
+                }
+            }
+        }
+    }
 
-	return $size;
+    return $size;
 }
 
 
@@ -113,39 +112,44 @@ function format_bytes($size, $precision=0) {
     return sprintf('%.'.$precision.'f', $size).$sizes[$total];
 }
 
+function get_file_extension($file) {
+    return end(explode('.', $file));
+}
 
-//
+
+// 
 // This function returns the mime type of $file.
 //
 function get_file_type($file) {
-	global $image_types, $movie_types, $archive_types, $document_types, $font_types;
+    global $image_types, $movie_types, $archive_types, $document_types, $font_types;
 
-	$pos = strrpos($file, ".");
-	if ($pos === false) {
-		return "Unknown File";
-	}
+    $pos = strrpos($file, ".");
+    if ($pos === 0) {
+        return "Unknown File";
+    }
 
-	$ext = rtrim(substr($file, $pos+1), "~");
-	if(in_array($ext, $image_types)) {
-		$type = "Image File";
+    $ext = rtrim(get_file_extension($file), "~");
+    $ext = rtrim(substr($file, $pos+1), "~");
+    if(in_array($ext, $image_types)) {
+        $type = "Image File";
 
-	} elseif(in_array($ext, $movie_types)) {
-		$type = "Video File";
+    } elseif(in_array($ext, $movie_types)) {
+        $type = "Video File";
 
-	} elseif(in_array($ext, $archive_types)) {
-		$type = "Compressed Archive";
+    } elseif(in_array($ext, $archive_types)) {
+        $type = "Compressed Archive";
 
-	} elseif(in_array($ext, $document_types)) {
-		$type = "Type Document";
+    } elseif(in_array($ext, $document_types)) {
+        $type = "Type Document";
 
-	} elseif(in_array($ext, $font_types)) {
-		$type = "Type Font";
+    } elseif(in_array($ext, $font_types)) {
+        $type = "Type Font";
 
-	} else {
-		$type = "File";
-	}
+    } else {
+        $type = "File";
+    }
 
-	return(strtoupper($ext) . " " . $type);
+    return(strtoupper($ext) . " " . $type);
 }
 
 
@@ -154,105 +158,175 @@ function get_file_type($file) {
 $vpath = ($path != "./")?$path:"";
 print '<!DOCTYPE html>
 <html lang="en">
-	<head>
-		<meta charset="utf-8">
-		<title>Index of /'.$vpath.'</title>
-		<style type="text/css">
-		a, a:active {text-decoration: none; color: blue;}
-		a:visited {color: #48468F;}
-		a:hover, a:focus {text-decoration: underline; color: red;}
-		body {background-color: #F5F5F5;}
-		h2 {margin-bottom: 12px;}
-		table {margin-left: 12px; padding:0px; border-collapse:collapse;}
-		th, td { font-family: "Courier New", Courier, monospace; font-size: 10pt; text-align: left;}
-		th { font-weight: bold; padding-right: 14px; padding-bottom: 3px;}
-		td {padding-right: 14px;}
-		td.s, th.s {text-align: right;}
-		div.list { background-color: white; border-top: 1px solid #646464; border-bottom: 1px solid #646464; padding-top: 10px; padding-bottom: 14px;}
-		div.foot, div.script_title { font-family: "Courier New", Courier, monospace; font-size: 10pt; color: #787878; padding-top: 4px;}
-		div.script_title {float:right;text-align:right;font-size:8pt;color:#999;}
-		</style>
-	</head>
-	<body>
+    <head>
+        <meta charset="utf-8">
+        <title>Index of /'.$vpath.'</title>
+        <style type="text/css">
+            a, a:active {text-decoration: none; color: blue;}
+            a:visited {color: #48468F;}
+            a:hover, a:focus {text-decoration: underline; color: red;}
+            body {background-color: #F5F5F5;}
+            h2 {margin-bottom: 12px;}
+            table {margin-left: 12px; padding:0px; border-collapse:collapse;}
+            th, td { font-family: "Courier New", Courier, monospace; font-size: 10pt; text-align: left;}
+            th { font-weight: bold; padding-right: 14px; padding-bottom: 3px;}
+            td {padding-right: 14px;}
+            td.s, th.s {text-align: right;}
+            div.list { background-color: white; border-top: 1px solid #646464; border-bottom: 1px solid #646464; padding-top: 10px; padding-bottom: 14px;}
+            div.foot, div.script_title { font-family: "Courier New", Courier, monospace; font-size: 10pt; color: #787878; padding-top: 4px;}
+            div.script_title {float:right;text-align:right;font-size:8pt;color:#999;}
+            #player {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+            }
+            .overlay {
+                z-index: 1000;
+                border: medium none;
+                margin: 0pt;
+                padding: 0pt;
+                width: 100%;
+                height: 100%;
+                top: 0;
+                left: 0;
+                background-color: #000;
+                opacity: 0.4;
+                position: fixed;
+            }
+            .horison {
+                color: white;
+                text-align: center;
+                position: absolute;
+                top: 50%;
+                left: 0px;
+                width: 100%;
+                height: 1px;
+                overflow: visible;
+                visibility: visible;
+                display: block
+            }
+            #vid {
+                z-index: 1001;
+                font-family: Verdana, Geneva, Arial, sans-serif;
+                margin-left: -320px;
+                position: absolute;
+                top: -240px;
+                left: 50%;
+                visibility: visible;
+            }
+        </style>
+        <script type="text/javascript">
+            var original_title = document.title,
+                $ = function(id) {
+                    return document.getElementById(id);
+                },
+                play = function(elem) {
+                    var vid = $("vid"),
+                        player = $("player");
+                    player.style.display = "";
+                    vid.src = elem.href;
+                    vid.play();
+                    document.title = "▶ " + elem.innerText;
+                    return false;
+                },
+                hide = function() {
+                    var vid = $("vid"),
+                        player = $("player");
+                    vid.src = "";
+                    document.title = original_title;
+                    player.style.display = "none";
+                };
+        </script>
+    </head>
+    <body onload="hide();">
+    <div id="player">
+        <div class=overlay onclick="hide();"></div>
+        <div class="horison">
+            <video width="690" height="480" controls id="vid">
+                Your browser does not support the video tag.
+            </video>
+        </div>
+    </div>
 ';
 
-if ($display_header)
-{
-	if (is_file($path.'/HEADER'))
-	{
-		print "<pre>";
-		print(nl2br(file_get_contents($path.'/HEADER')));
-		print "</pre>";
-	}
+if ($display_header) {
+    if (is_file($path.'/HEADER')) {
+        print "<pre>";
+        print(nl2br(file_get_contents($path.'/HEADER')));
+        print "</pre>";
+    }
 
-	if (is_file($path.'/HEADER.html'))
-	{
-		readfile($path.'/HEADER.html');
-	}
+    if (is_file($path.'/HEADER.html')) {
+        readfile($path.'/HEADER.html');
+    }
 }
 
 print "<h2>Index of /" . $vpath ."</h2>
-	<div class='list'>
-	<table>";
-
+    <div class='list'>
+    <table>";
 
 // Get all of the folders and files.
 $folderlist = array();
 $filelist = array();
 if($handle = @opendir($path)) {
-	while(($item = readdir($handle)) !== false) {
-		if(is_dir($path.'/'.$item) and $item != '.' and $item != '..') {
-			if( $show_hidden_files == "false" ) {
-				if(substr($item, 0, 1) == "." or substr($item, -1) == "~") {
-				  continue;
-				}
-			}
-			$folderlist[] = array(
-				'name' => $item,
-				'size' => (($calculate_folder_size)?foldersize($path.'/'.$item):0),
-				'modtime'=> filemtime($path.'/'.$item),
-				'file_type' => "Directory"
-			);
-		}
+    while(($item = readdir($handle)) !== false) {
+        $filepath = $path.'/'.$item;
+        if(is_dir($filepath) and $item != '.' and $item != '..') {
+            if( $show_hidden_files === false ) {
+                if(substr($item, 0, 1) == "." or substr($item, -1) == "~") {
+                  continue;
+                }
+            }
+            $folderlist[] = array(
+                'name' => $item,
+                'size' => (($calculate_folder_size)?foldersize($filepath):0),
+                'modtime'=> filemtime($filepath),
+                'file_type' => "Directory"
+            );
+        }
 
-		elseif(is_file($path.'/'.$item)) {
-			if ($item === basename($_SERVER['SCRIPT_NAME']))
-			{
-				continue;
-			}
-			if ($hide_header)
-			{
-				if ($item === 'HEADER' || $item === 'HEADER.html')
-				{
-					continue;
-				}
-			}
-			if ($hide_readme)
-			{
-				if ($item === 'README' || $item === 'README.html')
-				{
-					continue;
-				}
-			}
-			if( $show_hidden_files == "false" ) {
-				if(substr($item, 0, 1) == "." or substr($item, -1) == "~") {
-				  continue;
-				}
-			}
-			$filelist[] = array(
-				'name'=> $item,
-				'size'=> filesize($path.'/'.$item),
-				'modtime'=> filemtime($path.'/'.$item),
-				'file_type' => get_file_type($path.'/'.$item)
-			);
-		}
-	}
-	fclose($handle);
+        elseif(is_file($filepath)) {
+            if ($item === basename($_SERVER['SCRIPT_NAME'])) {
+                continue;
+            }
+            if ($hide_header) {
+                if ($item === 'HEADER' || $item === 'HEADER.html') {
+                    continue;
+                }
+            }
+            if ($hide_readme) {
+                if ($item === 'README' || $item === 'README.html') {
+                    continue;
+                }
+            }
+
+            if( $show_hidden_files === false ) {
+                if(substr($item, 0, 1) == "." or substr($item, -1) == "~" or substr($item, -5) == ".part") {
+                  continue;
+                }
+            }
+            $filelist[] = array(
+                'name'=> $item,
+                'size'=> filesize($filepath),
+                'modtime'=> filemtime($filepath),
+                'file_type' => get_file_type($filepath)
+            );
+        }
+    }
+    fclose($handle);
 }
+
+$sort_methods = array();
+$sort_methods['name'] = "Name";
+$sort_methods['modtime'] = "Last Modified";
+$sort_methods['size'] = "Size";
+$sort_methods['file_type'] = "Type";
 
 
 if(!isset($_GET['sort'])) {
-	$_GET['sort'] = 'name';
+    $_GET['sort'] = 'modtime';
 }
 
 // Figure out what to sort files by
@@ -268,31 +342,25 @@ foreach ($folderlist as $key=>$row) {
 }
 
 // Order the files and folders
-if($_GET['order']) {
-	array_multisort($folder_order_by, SORT_DESC, $folderlist);
-	array_multisort($file_order_by, SORT_DESC, $filelist);
+if(!$_GET['order']) {
+    array_multisort($folder_order_by, SORT_DESC, $folderlist);
+    array_multisort($file_order_by, SORT_DESC, $filelist);
 } else {
-	array_multisort($folder_order_by, SORT_ASC, $folderlist);
-	array_multisort($file_order_by, SORT_ASC, $filelist);
-	$order = "&amp;order=desc";
+    array_multisort($folder_order_by, SORT_ASC, $folderlist);
+    array_multisort($file_order_by, SORT_ASC, $filelist);
+    $order = "&amp;order=asc";
 }
 
 
 // Show sort methods
 print "<thead><tr>";
 
-$sort_methods = array();
-$sort_methods['name'] = "Name";
-$sort_methods['modtime'] = "Last Modified";
-$sort_methods['size'] = "Size";
-$sort_methods['file_type'] = "Type";
-
 foreach($sort_methods as $key=>$item) {
-	if($_GET['sort'] == $key) {
-		print "<th class='n'><a href='?sort=$key$order'>$item</a></th>";
-	} else {
-		print "<th class='n'><a href='?sort=$key'>$item</a></th>";
-	}
+    if($_GET['sort'] == $key) {
+        print "<th class='n'><a href='?sort=$key$order'>$item</a></th>";
+    } else {
+        print "<th class='n'><a href='?sort=$key'>$item</a></th>";
+    }
 }
 print "</tr></thead><tbody>";
 
@@ -300,69 +368,75 @@ print "</tr></thead><tbody>";
 
 // Parent directory link
 if($path != "./") {
-	print "<tr><td class='n'><a href='..'>Parent Directory</a>/</td>";
-	print "<td class='m'> </td>";
-	print "<td class='s'> </td>";
-	print "<td class='t'>Directory</td></tr>";
+    print "<tr><td class='n'><a href='..'>Parent Directory</a>/</td>";
+    print "<td class='m'> </td>";
+    print "<td class='s'> </td>";
+    print "<td class='t'>Directory</td></tr>";
 }
-
-
-
-// Print folder information
-foreach($folderlist as $folder) {
-	print "<tr><td class='n'><a href='" . addslashes($folder['name']). "'>" .htmlentities($folder['name']). "</a>/</td>";
-	print "<td class='m'>" . date('Y-M-d H:i:s', $folder['modtime']) . "</td>";
-	print "<td class='s'>" . (($calculate_folder_size)?format_bytes($folder['size'], 2):'--') . " </td>";
-	print "<td class='t'>" . $folder['file_type']                    . "</td></tr>";
-}
-
-
-
-// This simply creates an extra line for file/folder seperation
-print "<tr><td colspan='4' style='height:7px;'></td></tr>";
-
 
 
 // Print file information
+$last_date = '';
 foreach($filelist as $file) {
-	print "<tr><td class='n'><a href='" . addslashes($file['name']). "'>" .htmlentities($file['name']). "</a></td>";
-	print "<td class='m'>" . date('Y-M-d H:i:s', $file['modtime'])   . "</td>";
-	print "<td class='s'>" . format_bytes($file['size'],2)           . " </td>";
-	print "<td class='t'>" . $file['file_type']                      . "</td></tr>";
+    // Every new day starts with extra line
+    $this_date = date('Y-M-d', $file['modtime']);
+    if($last_date != $this_date) {
+        print "<tr><td colspan='4' style='height:7px;'></td></tr>";
+    }
+    $last_date = $this_date;
+
+    print "<tr><td class='n'><a href='" . addslashes($file['name']). "'";
+    $ext = get_file_extension($file['name']);
+    if($ext === 'mp4') {
+        print " onclick='return play(this);'";
+    }
+
+    print ">" .htmlentities($file['name']). "</a>";
+    print "</td><td class='m'>" . date('Y-M-d H:m:s', $file['modtime'])   . "</td>";
+    print "<td class='s'>" . format_bytes($file['size'],2)           . " </td>";
+    print "<td class='t'>" . $file['file_type']                      . "</td></tr>";
+}
+
+// This simply creates an extra line for file/folder separation
+print "<tr><td colspan='4' style='height:7px;'></td></tr>";
+
+// Print folder information
+foreach($folderlist as $folder) {
+    print "<tr><td class='n'><a href='" . addslashes($folder['name']). "'>" .htmlentities($folder['name']). "</a>/</td>";
+    print "<td class='m'>" . date('Y-M-d H:m:s', $folder['modtime']) . "</td>";
+    print "<td class='s'>" . (($calculate_folder_size)?format_bytes($folder['size'], 2):'--') . " </td>";
+    print "<td class='t'>" . $folder['file_type']                    . "</td></tr>";
 }
 
 
 
 // Print ending stuff
 print "</tbody>
-	</table>
-	</div>";
+    </table>
+    </div>";
 
-if ($display_readme)
-{
-	if (is_file($path.'/README'))
-	{
-		print "<pre>";
-		print(nl2br(file_get_contents($path.'/README')));
-		print "</pre>";
-	}
+if ($display_readme) {
+    if (is_file($path.'/README')) {
+        print "<pre>";
+        print(nl2br(file_get_contents($path.'/README')));
+        print "</pre>";
+    }
 
-	if (is_file($path.'/README.html'))
-	{
-		readfile($path.'/README.html');
-	}
+    if (is_file($path.'/README.html')) {
+        readfile($path.'/README.html');
+    }
 }
 
-print "	<div class='script_title'>Lighttpd Enhanced Directory Listing Script</div>
-	<div class='foot'>". $_ENV['SERVER_SOFTWARE'] . "</div>
-	</body>
-	</html>";
+print " <div class='script_title'>Lighttpd Enhanced Directory Listing Script</div>
+    <div class='foot'>". $_ENV['SERVER_SOFTWARE'] . "</div>
+    </body>
+    </html>";
 
 
 /* -------------------------------------------------------------------------------- *\
-	I hope you enjoyed my take on the enhanced directory listing script!
-	If you have any questions, feel free to contact me.
+    I hope you enjoyed my take on the enhanced directory listing script!
+    If you have any questions, feel free to contact me.
 
-	Regards,
-	   Evan Fosmark < me@evanfosmark.com >
+    Regards,
+       Evan Fosmark < me@evanfosmark.com >
 \* -------------------------------------------------------------------------------- */
