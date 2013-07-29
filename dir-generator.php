@@ -247,7 +247,7 @@ if($handle = @opendir($path)) {
 			);
 		}
 	}
-	fclose($handle);
+	closedir($handle);
 }
 
 
