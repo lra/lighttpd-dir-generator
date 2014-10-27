@@ -109,8 +109,10 @@ function format_bytes($size, $precision=0) {
     $sizes = array('YB', 'ZB', 'EB', 'PB', 'TB', 'GB', 'MB', 'KB', 'B');
     $total = count($sizes);
 
+    if ($size < 1024)
+	    $precision=0;
     while($total-- && $size > 1024) $size /= 1024;
-    return sprintf('%.'.$precision.'f', $size).$sizes[$total];
+    return sprintf('%.'.$precision.'f ', $size).$sizes[$total];
 }
 
 
