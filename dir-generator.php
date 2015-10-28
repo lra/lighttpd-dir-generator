@@ -270,9 +270,10 @@ foreach ($folderlist as $key=>$row) {
 }
 
 // Order the files and folders
-if($_GET['order']) {
+if(isset($_GET['order']) && $_GET['order']) {
 	array_multisort($folder_order_by, SORT_DESC, $folderlist);
 	array_multisort($file_order_by, SORT_DESC, $filelist);
+	$order = "&amp;order=asc";
 } else {
 	array_multisort($folder_order_by, SORT_ASC, $folderlist);
 	array_multisort($file_order_by, SORT_ASC, $filelist);
@@ -356,7 +357,7 @@ if ($display_readme)
 }
 
 print "	<div class='script_title'>Lighttpd Enhanced Directory Listing Script</div>
-	<div class='foot'>". $_ENV['SERVER_SOFTWARE'] . "</div>
+	<div class='foot'>". $_SERVER['SERVER_SOFTWARE'] . "</div>
 	</body>
 	</html>";
 
